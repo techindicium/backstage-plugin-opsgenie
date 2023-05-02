@@ -29,7 +29,7 @@ const Graph = ({ context }: { context: Context }) => {
 
 export const DailyIncidents = ({ context }: { context: Context }) => {
   return (
-    <InfoCard title="Incidents by day" action={<SaveAction targetRef="daily-incidents" />}>
+    <InfoCard title="Incidents by indicium day" action={<SaveAction targetRef="daily-incidents" />}>
       <Graph context={context} />
     </InfoCard>
   );
