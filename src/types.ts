@@ -10,6 +10,7 @@ export interface Alert {
   priority: string; // TODO: enum
   createdAt: string;
   updatedAt: string;
+  impactStartDate: string;
 }
 
 export interface ResponderRef {

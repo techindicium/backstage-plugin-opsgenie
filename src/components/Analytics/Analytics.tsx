@@ -8,6 +8,7 @@ import { HourlyIncidents } from './HourlyIncidents';
 import { MonthlyIncidentsResponders } from './MonthlyIncidentsResponder';
 import { DailyIncidentsResponders } from './DailyIncidentsResponder';
 import { DailyIncidents } from './DailyIncidents';
+import { DailyAlerts } from './DailyAlerts';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
 import moment from 'moment';
 import { opsgenieApiRef } from '../../api';
@@ -17,6 +18,8 @@ import { Alert } from '@material-ui/lab';
 import { Context, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } from '../../analytics';
 import { InfoPanel } from '../InfoPanel';
 import { WeeklyImpactResponders } from './WeeklyImpactResponder';
+import { WeeklyAlerts } from './WeeklyAlerts';
+import { HourlyAlerts } from './HourlyAlerts';
 
 export const Analytics = () => {
   const configApi = useApi(configApiRef);
@@ -24,6 +27,7 @@ export const Analytics = () => {
 
   const from = moment().subtract(1, 'year').startOf('quarter');
   const to = moment();
+  const fromLastFourWeeks = moment().subtract(4, 'weeks').startOf('week');
 
   const { value: data, loading, error } = useAsync(async () => {
     return Promise.all([
@@ -31,8 +35,11 @@ export const Analytics = () => {
         limit: 100,
         query: `createdAt < ${to.valueOf()} AND createdAt > ${from.valueOf()}`
       }),
+      opsgenieApi.getAlerts({
+        query: `createdAt < ${to.valueOf()} AND createdAt > ${fromLastFourWeeks.valueOf()}`,
+      }),
       opsgenieApi.getTeams(),
-    ])
+    ]);
   });
 
   if (loading) {
@@ -45,7 +52,8 @@ export const Analytics = () => {
     from: from,
     to: to,
     incidents: data![0].filter(incident => moment(incident.impactStartDate).isAfter(from)),
-    teams: data![1],
+    alerts: data![1].filter(alert => moment(alert.createdAt).isAfter(from)),
+    teams: data![2],
   };
 
   const businessHours = {
@@ -57,10 +65,11 @@ export const Analytics = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <InfoPanel
-          title="This graphs cover one year worth of incidents, from the current quarter to the same quarter last year."
+          title="This graphs cover one year worth of incidents, from the current quarter to the same quarter last year. And the last four weeks of alerts."
           message={
             <ul>
               <li>Incidents from {from.format('LL')} to now are used</li>
+              <li>Alerts from {fromLastFourWeeks.format('LL')} to now are used</li>
               <li>Business hours are {businessHours.start} to {businessHours.end}</li>
               <li>Responders are read from the <code>responders</code> incident extra property if defined, or from the "responders" section of an incident.</li>
             </ul>
@@ -69,7 +78,27 @@ export const Analytics = () => {
       </Grid>
 
       <Grid item md={6} xs={12}>
+        <WeeklyAlerts context={context} />
+      </Grid>
+
+      <Grid item md={6} xs={12}>
         <WeeklyIncidents context={context} />
+      </Grid>
+
+      <Grid item md={6} xs={12}>
+        <DailyAlerts context={context} />
+      </Grid>
+
+      <Grid item md={6} xs={12}>
+        <DailyIncidents context={context} />
+      </Grid>
+
+      <Grid item md={6} xs={12}>
+        <HourlyAlerts context={context} />
+      </Grid>
+
+      <Grid item md={6} xs={12}>
+        <HourlyIncidents context={context} />
       </Grid>
 
       <Grid item md={6} xs={12}>
@@ -90,14 +119,6 @@ export const Analytics = () => {
 
       <Grid item md={6} xs={12}>
         <DailyIncidentsResponders context={context} />
-      </Grid>
-
-      <Grid item md={6} xs={12}>
-        <HourlyIncidents context={context} />
-      </Grid>
-
-      <Grid item md={6} xs={12}>
-        <DailyIncidents context={context} />
       </Grid>
 
       <Grid item md={6} xs={12}>

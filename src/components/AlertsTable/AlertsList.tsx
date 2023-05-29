@@ -5,11 +5,18 @@ import { Progress } from '@backstage/core-components';
 import Alert from "@material-ui/lab/Alert";
 import { AlertsTable } from './AlertsTable';
 import { opsgenieApiRef } from '../../api';
+import moment from 'moment';
+
+
 
 export const AlertsList = () => {
   const opsgenieApi = useApi(opsgenieApiRef);
 
-  const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlerts());
+  const fromLastFourWeeks = moment().subtract(3, 'weeks').startOf('week');
+  const to = moment();
+  
+
+  const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlerts({query: `createdAt < ${to.valueOf()} AND createdAt > ${fromLastFourWeeks.valueOf()}`}));
 
   if (loading) {
     return <Progress />;

@@ -41,6 +41,11 @@ export interface Opsgenie {
 
 interface AlertsResponse {
   data: Alert[];
+  paging: {
+    first: string;
+    next?: string;
+    last: string;
+  };
 }
 
 interface IncidentsResponse {
@@ -88,7 +93,6 @@ type Options = {
    */
   proxyPath?: string;
 };
-
 /**
  * API to talk to Opsgenie.
  */
@@ -128,11 +132,20 @@ export class OpsgenieApi implements Opsgenie {
   }
 
   async getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]> {
-    const limit = opts?.limit || 50;
-    const query = opts?.query ? `&query=${opts?.query}` : '';
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}${query}`);
+    const limit = 100;
+    const query = opts?.query ? `&query=${opts.query}` : '';
+  
+    let response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}${query}`);
+    let alerts = response.data;
+  
+    while (response.paging.next) {
+      const parsedUrl = new URL(response.paging.next);
+      response = await this.fetch<AlertsResponse>(parsedUrl.pathname + parsedUrl.search);
+  
+      alerts = alerts.concat(response.data);
+    }
 
-    return response.data;
+    return alerts;
   }
 
   async getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]> {
