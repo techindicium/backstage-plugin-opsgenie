@@ -3,6 +3,7 @@ import { AlertsList } from '../AlertsTable';
 import { IncidentsList } from '../IncidentsTable';
 import { OnCallList } from '../OnCallList';
 import { Analytics } from '../Analytics';
+import { Monitoring } from '../Monitoring';
 import { Layout } from './Layout';
 import { OpsgeniePageProps } from "./OpsgeniePage";
 
@@ -20,6 +21,9 @@ export const DefaultOpsgeniePage = ({ onCallListCardsCount }: OpsgeniePageProps)
       </Layout.Route>
       <Layout.Route path="analytics" title="Analytics">
         <Analytics />
+      </Layout.Route>
+      <Layout.Route path="monitoring" title="Monitoring">
+        <Monitoring />
       </Layout.Route>
     </Layout>
   );

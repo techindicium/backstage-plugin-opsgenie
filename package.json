@@ -1,13 +1,13 @@
 {
-  "name": "@arthurcerqueira/backstage-plugin-opsgenie",
-  "version": "0.6.35",
+  "name": "@techindicium/backstage-plugin-opsgenie",
+  "version": "0.0.2",
   "main": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "homepage": "https://github.com/arthurcerqueiraindicium/backstage-plugin-opsgenie",
+  "homepage": "https://github.com/techindicium/backstage-plugin-opsgenie",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arthurcerqueiraindicium/backstage-plugin-opsgenie"
+    "url": "https://github.com/techindicium/backstage-plugin-opsgenie"
   },
   "publishConfig": {
     "access": "public",
